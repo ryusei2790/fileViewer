@@ -1,0 +1,22 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - cargo_cache:/usr/local/cargo/registry
+      - cargo_target:/app/src-tauri/target
+    working_dir: /app
+    ports:
+      - "1420:1420"   # Vite dev server
+      - "1421:1421"   # Vite HMR
+    environment:
+      - NODE_ENV=development
+    command: pnpm dev  # フロントエンドdev server起動
+
+volumes:
+  node_modules:
+  cargo_cache:
+  cargo_target:
