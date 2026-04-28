@@ -26,10 +26,10 @@
         isDragging = true;
       } else if (event.payload.type === 'drop') {
         isDragging = false;
-        // ドロップされたファイルパスを取得（最初の1つのみ）
+        // ドロップされた全ファイルを一括で開く
         const paths = event.payload.paths;
         if (paths.length > 0) {
-          await openDroppedFile(paths[0]);
+          await openDroppedFiles(paths);
         }
       } else if (event.payload.type === 'leave') {
         isDragging = false;
@@ -42,20 +42,24 @@
   });
 
   /**
-   * ドロップされたファイルを開く
+   * ドロップされた複数ファイルを一括で開く
    */
-  async function openDroppedFile(path: string) {
+  async function openDroppedFiles(paths: string[]) {
     try {
-      const meta = await getFileMeta(path);
-      const entry: FileEntry = {
-        id: meta.path,
-        path: meta.path,
-        name: meta.name,
-        extension: meta.extension,
-        viewerType: getViewerType(meta.extension),
-        openedAt: new Date()
-      };
-      fileStore.openFile(entry);
+      const entries: FileEntry[] = await Promise.all(
+        paths.map(async (path) => {
+          const meta = await getFileMeta(path);
+          return {
+            id: meta.path,
+            path: meta.path,
+            name: meta.name,
+            extension: meta.extension,
+            viewerType: getViewerType(meta.extension),
+            openedAt: new Date()
+          };
+        })
+      );
+      fileStore.openMultipleFiles(entries);
     } catch (e) {
       console.error('ファイルのオープンに失敗:', e);
     }
@@ -72,7 +76,7 @@
     📄
   </div>
   <p class="text-lg font-medium text-gray-500 dark:text-gray-400">
-    {isDragging ? 'ここにドロップ' : 'ファイルをドラッグ&ドロップ'}
+    {isDragging ? 'ここにドロップ' : 'ファイルをドラッグ&ドロップ（複数可）'}
   </p>
   <p class="text-sm text-gray-400 dark:text-gray-500">
     または左のサイドバーから「ファイルを開く」をクリック

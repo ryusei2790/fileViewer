@@ -79,6 +79,30 @@ function createFileStore() {
 		},
 
 		/**
+		 * 複数ファイルを一括で開く（バッチ追加）
+		 *
+		 * 重複チェックを行いつつ、新規ファイルのみまとめて追加する。
+		 * 最後に追加されたファイルをアクティブタブにする。
+		 */
+		openMultipleFiles(entries: FileEntry[]) {
+			const newEntries = entries.filter(
+				(entry) => !openFiles.some((f) => f.id === entry.id)
+			);
+			if (newEntries.length === 0) {
+				// すべて既存の場合、最後のファイルをアクティブにする
+				if (entries.length > 0) {
+					activeFileId = entries[entries.length - 1].id;
+				}
+				return;
+			}
+			openFiles = [...openFiles, ...newEntries];
+			activeFileId = newEntries[newEntries.length - 1].id;
+			for (const entry of newEntries) {
+				this.addToRecent(entry);
+			}
+		},
+
+		/**
 		 * タブを閉じる
 		 *
 		 * 閉じたタブがアクティブだった場合、隣のタブに切り替える。
