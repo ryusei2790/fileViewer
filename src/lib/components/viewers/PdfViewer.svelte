@@ -26,9 +26,10 @@
   ).href;
 
   // CJK（日中韓）フォントの文字マッピングに必要なCMapファイルのパス
-  const cMapUrl = new URL('pdfjs-dist/cmaps/', import.meta.url).href;
+  // static/ ディレクトリからの静的配信で確実にアクセス可能にする
+  const cMapUrl = '/cmaps/';
   // 標準フォントデータのパス（PDF内蔵フォントが欠けている場合のフォールバック）
-  const standardFontDataUrl = new URL('pdfjs-dist/standard_fonts/', import.meta.url).href;
+  const standardFontDataUrl = '/standard_fonts/';
 
   onMount(async () => {
     try {
