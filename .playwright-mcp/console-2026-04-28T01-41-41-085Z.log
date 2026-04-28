@@ -1,0 +1,12 @@
+[    2223ms] [WARNING] The next HMR update will cause the page to reload @ http://localhost:1420/node_modules/.pnpm/@sveltejs+kit@2.58.0_@sveltejs+vite-plugin-svelte@5.1.1_svelte@5.55.5_vite@6.4.2_@types_91b954abea64c3d8b2e61cdb4d56476b/node_modules/@sveltejs/kit/src/runtime/client/client.js?v=cc0ac640:3322
+[    2223ms] [ERROR] Svelte error: rune_outside_svelte
+The `$state` rune is only available inside `.svelte` and `.svelte.js/ts` files
+https://svelte.dev/e/rune_outside_svelte
+    at rune_outside_svelte (http://localhost:1420/node_modules/.vite/deps/chunk-LEBA4TK5.js?v=cc0ac640:484:19)
+    at get (http://localhost:1420/node_modules/.vite/deps/chunk-HQMG5B7Y.js?v=cc0ac640:4218:11)
+    at createFileStore (http://localhost:1420/src/lib/stores/fileStore.ts:3:19)
+    at http://localhost:1420/src/lib/stores/fileStore.ts:77:26 @ http://localhost:1420/@fs/Users/ryusei/Mywork/fileViewer/.svelte-kit/generated/client/app.js:15
+[   58279ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:1420/src/lib/stores/fileStore.ts?t=1777340558985:0
+[   58280ms] [WARNING] The next HMR update will cause the page to reload @ http://localhost:1420/node_modules/.pnpm/@sveltejs+kit@2.58.0_@sveltejs+vite-plugin-svelte@5.1.1_svelte@5.55.5_vite@6.4.2_@types_91b954abea64c3d8b2e61cdb4d56476b/node_modules/@sveltejs/kit/src/runtime/client/client.js?v=cc0ac640:3322
+[   58280ms] [ERROR] TypeError: Failed to fetch dynamically imported module: http://localhost:1420/.svelte-kit/generated/client/nodes/2.js?t=1777340558993 @ http://localhost:1420/@fs/Users/ryusei/Mywork/fileViewer/.svelte-kit/generated/client/app.js:15
+[   58293ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:1420/src/lib/stores/settingsStore.ts?t=1777340558993:0

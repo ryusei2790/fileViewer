@@ -1,0 +1,15 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - heading "FileViewer" [level=1] [ref=e6]
+      - button "🌙" [ref=e7]
+    - button "ファイルを開く" [ref=e9]
+    - generic [ref=e10]:
+      - heading "最近開いたファイル" [level=2] [ref=e11]
+      - paragraph [ref=e12]: まだファイルを開いていません
+  - main [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: 📄
+      - paragraph [ref=e17]: ファイルをドラッグ&ドロップ
+      - paragraph [ref=e18]: または左のサイドバーから「ファイルを開く」をクリック
+      - paragraph [ref=e19]: "対応形式: PDF, Markdown, 画像, CSV, JSON, YAML, HTML, テキスト/コード"

@@ -6,7 +6,7 @@
   設計意図: ブラウザのタブと同じ操作感で複数ファイルを切り替えられるようにする。
 -->
 <script lang="ts">
-  import { fileStore } from '$lib/stores/fileStore';
+  import { fileStore } from '$lib/stores/fileStore.svelte';
 
   /**
    * 拡張子に応じたアイコンを返す

@@ -6,7 +6,7 @@
   設計意図: fileStore.activeFile の状態に応じてビューアを動的に切り替える。
 -->
 <script lang="ts">
-  import { fileStore } from '$lib/stores/fileStore';
+  import { fileStore } from '$lib/stores/fileStore.svelte';
   import Sidebar from '$lib/components/Sidebar.svelte';
   import TabBar from '$lib/components/TabBar.svelte';
   import FileDropZone from '$lib/components/FileDropZone.svelte';

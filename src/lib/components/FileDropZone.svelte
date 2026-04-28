@@ -8,7 +8,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { getCurrentWindow } from '@tauri-apps/api/window';
-  import { fileStore, type FileEntry } from '$lib/stores/fileStore';
+  import { fileStore, type FileEntry } from '$lib/stores/fileStore.svelte';
   import { getFileMeta } from '$lib/utils/fileReader';
   import { getViewerType } from '$lib/utils/fileType';
 

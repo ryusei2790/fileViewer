@@ -6,8 +6,8 @@
 -->
 <script lang="ts">
   import { open } from '@tauri-apps/plugin-dialog';
-  import { fileStore, type FileEntry } from '$lib/stores/fileStore';
-  import { settingsStore } from '$lib/stores/settingsStore';
+  import { fileStore, type FileEntry } from '$lib/stores/fileStore.svelte';
+  import { settingsStore } from '$lib/stores/settingsStore.svelte';
   import { getFileMeta } from '$lib/utils/fileReader';
   import { getViewerType } from '$lib/utils/fileType';
 
