@@ -25,6 +25,12 @@
     import.meta.url
   ).href;
 
+  // CJK（日中韓）フォントの文字マッピングに必要なCMapファイルのパス
+  // static/ ディレクトリからの静的配信で確実にアクセス可能にする
+  const cMapUrl = '/cmaps/';
+  // 標準フォントデータのパス（PDF内蔵フォントが欠けている場合のフォールバック）
+  const standardFontDataUrl = '/standard_fonts/';
+
   onMount(async () => {
     try {
       // base64でPDFを読み込む
@@ -35,7 +41,12 @@
         bytes[i] = binaryString.charCodeAt(i);
       }
 
-      const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+      const pdf = await pdfjsLib.getDocument({
+        data: bytes,
+        cMapUrl,
+        cMapPacked: true,
+        standardFontDataUrl,
+      }).promise;
       pageCount = pdf.numPages;
 
       // 全ページをCanvas描画
