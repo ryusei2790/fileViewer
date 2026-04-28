@@ -4,6 +4,7 @@
 /// ローカルファイルシステムからファイルを読み込む。
 /// テキスト系 → UTF-8文字列、バイナリ系 → base64エンコード文字列で返す。
 use base64::{engine::general_purpose::STANDARD, Engine};
+use chardetng::EncodingDetector;
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
@@ -23,10 +24,31 @@ pub struct FileMeta {
 
 /// テキストファイルを読み込み、UTF-8文字列として返す
 ///
+/// バイト列として読み込み → エンコーディングを自動検出 → UTF-8に変換して返す。
+/// Shift_JIS, EUC-JP, UTF-16 等の非UTF-8ファイルにも対応する。
 /// 対応: .md, .txt, .csv, .json, .yaml, .yml, .html, .css, .js, .ts 等
 #[tauri::command]
 pub fn read_file_text(path: String) -> Result<String, String> {
-    fs::read_to_string(&path).map_err(|e| format!("ファイル読み込みエラー: {}", e))
+    let bytes = fs::read(&path).map_err(|e| format!("ファイル読み込みエラー: {}", e))?;
+
+    // UTF-8として有効ならそのまま返す（最も高速なパス）
+    if let Ok(text) = std::str::from_utf8(&bytes) {
+        return Ok(text.to_string());
+    }
+
+    // UTF-8でない場合、chardetngでエンコーディングを推定
+    let mut detector = EncodingDetector::new();
+    detector.feed(&bytes, true);
+    let encoding = detector.guess(None, true);
+
+    // encoding_rsでUTF-8に変換
+    let (decoded, _, had_errors) = encoding.decode(&bytes);
+    if had_errors {
+        // デコードエラーがあっても可能な限り表示する（置換文字で補完）
+        Ok(decoded.into_owned())
+    } else {
+        Ok(decoded.into_owned())
+    }
 }
 
 /// バイナリファイルを読み込み、base64エンコード文字列として返す
