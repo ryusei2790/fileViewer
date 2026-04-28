@@ -50,7 +50,7 @@
         canvas.classList.add('mx-auto', 'mb-4', 'shadow-md');
 
         const ctx = canvas.getContext('2d')!;
-        await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+        await page.render({ canvasContext: ctx, viewport }).promise;
 
         container.appendChild(canvas);
       }
