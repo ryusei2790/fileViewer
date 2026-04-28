@@ -13,10 +13,11 @@
 
   /**
    * ファイル選択ダイアログを開き、選択されたファイルをタブに追加する
+   * multiple: true で複数ファイルの一括選択に対応
    */
   async function handleOpenFile() {
     const selected = await open({
-      multiple: false,
+      multiple: true,
       filters: [
         {
           name: 'Supported Files',
@@ -36,17 +37,22 @@
 
     if (!selected) return;
 
-    const path = typeof selected === 'string' ? selected : selected;
-    const meta = await getFileMeta(path);
-    const entry: FileEntry = {
-      id: meta.path,
-      path: meta.path,
-      name: meta.name,
-      extension: meta.extension,
-      viewerType: getViewerType(meta.extension),
-      openedAt: new Date()
-    };
-    fileStore.openFile(entry);
+    // multiple: true の場合、selected は string[] になる
+    const paths = Array.isArray(selected) ? selected : [selected];
+    const entries: FileEntry[] = await Promise.all(
+      paths.map(async (path) => {
+        const meta = await getFileMeta(path);
+        return {
+          id: meta.path,
+          path: meta.path,
+          name: meta.name,
+          extension: meta.extension,
+          viewerType: getViewerType(meta.extension),
+          openedAt: new Date()
+        };
+      })
+    );
+    fileStore.openMultipleFiles(entries);
   }
 
   /**
