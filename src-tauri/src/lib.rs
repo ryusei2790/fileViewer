@@ -15,6 +15,7 @@ pub fn run() {
             commands::file::read_file_text,
             commands::file::read_file_binary,
             commands::file::get_file_meta,
+            commands::file::resolve_relative_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

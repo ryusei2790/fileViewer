@@ -62,6 +62,35 @@ pub fn read_file_binary(path: String) -> Result<String, String> {
     Ok(STANDARD.encode(&bytes))
 }
 
+/// ベースファイルのディレクトリを基準に相対パスを絶対パスに解決する
+///
+/// Markdown内の画像参照など、相対パスをファイルシステム上の絶対パスに変換する。
+/// base_file_path: 基準となるファイルの絶対パス（例: /Users/ryusei/docs/readme.md）
+/// relative_path: 解決したい相対パス（例: ./images/photo.png）
+/// 戻り値: 解決済みの絶対パス（例: /Users/ryusei/docs/images/photo.png）
+#[tauri::command]
+pub fn resolve_relative_path(
+    base_file_path: String,
+    relative_path: String,
+) -> Result<String, String> {
+    let base = Path::new(&base_file_path);
+    let base_dir = base
+        .parent()
+        .ok_or_else(|| "ベースパスの親ディレクトリを取得できません".to_string())?;
+
+    let resolved = base_dir.join(&relative_path);
+
+    // canonicalize で ../等を解決し、実在するパスか検証する
+    let canonical = resolved
+        .canonicalize()
+        .map_err(|e| format!("パス解決エラー ({}): {}", relative_path, e))?;
+
+    canonical
+        .to_str()
+        .map(|s| s.to_string())
+        .ok_or_else(|| "パスをUTF-8文字列に変換できません".to_string())
+}
+
 /// ファイルのメタ情報を取得する
 ///
 /// ファイル名、拡張子、サイズ、パスを返す。

@@ -51,6 +51,23 @@ export async function readFileBinary(path: string): Promise<string> {
 }
 
 /**
+ * ベースファイルのディレクトリを基準に相対パスを絶対パスに解決する
+ *
+ * @param baseFilePath - 基準となるファイルの絶対パス
+ * @param relativePath - 解決したい相対パス
+ * @returns 解決済みの絶対パス
+ */
+export async function resolveRelativePath(
+	baseFilePath: string,
+	relativePath: string
+): Promise<string> {
+	return invoke<string>('resolve_relative_path', {
+		baseFilePath,
+		relativePath
+	});
+}
+
+/**
  * 拡張子に応じた読み込みモードでファイルを読み込む
  *
  * fileType.ts の getReadMode() に基づき、
