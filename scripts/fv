@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# fv — FileViewer CLI ラッパー
+# ターミナルからファイルを FileViewer で開く（subl 互換）
+#
+# Usage:
+#   fv [file...]        ファイルを FileViewer で開く
+#   fv                  引数なし: アプリを前面に出すだけ
+#
+# Install:
+#   sudo install -m 755 scripts/fv /usr/local/bin/fv
+
+set -euo pipefail
+
+APP="/Applications/FileViewer.app"
+
+if [[ ! -d "$APP" ]]; then
+    echo "fv: FileViewer.app が見つかりません: $APP" >&2
+    exit 1
+fi
+
+# 引数なし: アプリを前面に出すだけ
+if [[ $# -eq 0 ]]; then
+    open -a "$APP"
+    exit 0
+fi
+
+resolved_paths=()
+exit_code=0
+
+for arg in "$@"; do
+    # 将来の --option フラグのために予約（現在はスキップ）
+    if [[ "$arg" == --* ]]; then
+        continue
+    fi
+
+    if [[ ! -e "$arg" ]]; then
+        echo "fv: 見つかりません: $arg" >&2
+        exit_code=1
+        continue
+    fi
+
+    if [[ -d "$arg" ]]; then
+        echo "fv: フォルダの指定は現在未対応です（ファイルのみ可）: $arg" >&2
+        exit_code=1
+        continue
+    fi
+
+    resolved_paths+=("$(realpath "$arg")")
+done
+
+if [[ ${#resolved_paths[@]} -gt 0 ]]; then
+    # -n で必ず新規プロセス起動を試みる（single-instance が二重起動を検知して転送する）
+    open -na "$APP" --args "${resolved_paths[@]}"
+else
+    open -a "$APP"
+fi
+
+exit $exit_code
