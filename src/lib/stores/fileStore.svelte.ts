@@ -143,6 +143,11 @@ function createFileStore() {
 				0,
 				MAX_RECENT_FILES
 			);
+		},
+
+		/** 最近開いたファイル履歴から指定IDのエントリを削除する */
+		removeFromRecent(id: string) {
+			recentFiles = recentFiles.filter((f) => f.id !== id);
 		}
 	};
 }

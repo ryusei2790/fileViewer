@@ -26,9 +26,6 @@
 
   <!-- 右メインエリア -->
   <div class="flex flex-1 flex-col overflow-hidden">
-    <!-- タブバー -->
-    <TabBar />
-
     <!-- コンテンツエリア -->
     <main class="flex-1 overflow-hidden">
       {#if fileStore.activeFile}
