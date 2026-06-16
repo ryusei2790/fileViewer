@@ -10,6 +10,7 @@
   import Sidebar from '$lib/components/Sidebar.svelte';
   import TabBar from '$lib/components/TabBar.svelte';
   import FileDropZone from '$lib/components/FileDropZone.svelte';
+  import ZoomContainer from '$lib/components/ZoomContainer.svelte';
   import PdfViewer from '$lib/components/viewers/PdfViewer.svelte';
   import MarkdownViewer from '$lib/components/viewers/MarkdownViewer.svelte';
   import ImageViewer from '$lib/components/viewers/ImageViewer.svelte';
@@ -30,29 +31,36 @@
     <main class="flex-1 overflow-hidden">
       {#if fileStore.activeFile}
         <!--
-          ビューア切り替え
-          {#key} で activeFileId が変わるたびにビューアを再マウントし、
-          前のファイルの状態が残らないようにする。
+          ZoomContainer: 全ビューア共通のズーム操作を提供。
+          {#key} の外側に置くことで、タブ切り替え時に ZoomContainer が再マウントされず
+          wheel/keydown リスナーが維持される。zoom 値は fileStore のタブごとの状態から取得。
         -->
-        {#key fileStore.activeFileId}
-          {#if fileStore.activeFile.viewerType === 'pdf'}
-            <PdfViewer path={fileStore.activeFile.path} />
-          {:else if fileStore.activeFile.viewerType === 'markdown'}
-            <MarkdownViewer path={fileStore.activeFile.path} />
-          {:else if fileStore.activeFile.viewerType === 'image'}
-            <ImageViewer path={fileStore.activeFile.path} extension={fileStore.activeFile.extension} />
-          {:else if fileStore.activeFile.viewerType === 'csv'}
-            <CsvViewer path={fileStore.activeFile.path} />
-          {:else if fileStore.activeFile.viewerType === 'json'}
-            <JsonViewer path={fileStore.activeFile.path} />
-          {:else if fileStore.activeFile.viewerType === 'yaml'}
-            <YamlViewer path={fileStore.activeFile.path} />
-          {:else if fileStore.activeFile.viewerType === 'html'}
-            <HtmlViewer path={fileStore.activeFile.path} />
-          {:else}
-            <TextViewer path={fileStore.activeFile.path} extension={fileStore.activeFile.extension} />
-          {/if}
-        {/key}
+        <ZoomContainer>
+          <!--
+            ビューア切り替え
+            {#key} で activeFileId が変わるたびにビューアを再マウントし、
+            前のファイルの状態が残らないようにする。
+          -->
+          {#key fileStore.activeFileId}
+            {#if fileStore.activeFile.viewerType === 'pdf'}
+              <PdfViewer path={fileStore.activeFile.path} />
+            {:else if fileStore.activeFile.viewerType === 'markdown'}
+              <MarkdownViewer path={fileStore.activeFile.path} />
+            {:else if fileStore.activeFile.viewerType === 'image'}
+              <ImageViewer path={fileStore.activeFile.path} extension={fileStore.activeFile.extension} />
+            {:else if fileStore.activeFile.viewerType === 'csv'}
+              <CsvViewer path={fileStore.activeFile.path} />
+            {:else if fileStore.activeFile.viewerType === 'json'}
+              <JsonViewer path={fileStore.activeFile.path} />
+            {:else if fileStore.activeFile.viewerType === 'yaml'}
+              <YamlViewer path={fileStore.activeFile.path} />
+            {:else if fileStore.activeFile.viewerType === 'html'}
+              <HtmlViewer path={fileStore.activeFile.path} />
+            {:else}
+              <TextViewer path={fileStore.activeFile.path} extension={fileStore.activeFile.extension} />
+            {/if}
+          {/key}
+        </ZoomContainer>
       {:else}
         <!-- ファイル未選択時: ドラッグ&ドロップゾーン -->
         <FileDropZone />

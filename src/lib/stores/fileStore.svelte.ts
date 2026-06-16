@@ -21,6 +21,8 @@ export interface FileEntry {
 	viewerType: ViewerType;
 	/** 開いた日時 */
 	openedAt: Date;
+	/** 表示倍率（1.0 = 100%）。タブごとに独立し、再起動でリセット */
+	zoom?: number;
 }
 
 /** 最近開いたファイル履歴の最大保持数 */
@@ -130,6 +132,16 @@ function createFileStore() {
 			if (openFiles.some((f) => f.id === id)) {
 				activeFileId = id;
 			}
+		},
+
+		/**
+		 * 指定タブのズーム倍率を更新する
+		 *
+		 * 25%〜500% の範囲にクランプして保存。
+		 */
+		setZoom(id: string, value: number) {
+			const clamped = Math.min(5.0, Math.max(0.25, value));
+			openFiles = openFiles.map((f) => (f.id === id ? { ...f, zoom: clamped } : f));
 		},
 
 		/**
