@@ -64,13 +64,36 @@
   function handleKeydown(e: KeyboardEvent) {
     if (!e.metaKey && !e.ctrlKey) return;
 
-    if (e.key === '=' || e.key === '+') {
+    // 設計意図: e.key はキーボード配列・Shiftの有無で揺れる（特にJIS配列では '+' が ';' キーのShift側）。
+    // e.code は物理キー位置ベースでレイアウト非依存のため、こちらを主軸に判定し、e.key はフォールバック扱いにする。
+    const code = e.code;
+    const key = e.key;
+
+    // ズームイン: Cmd+=, Cmd+Shift+= (→ '+'), JIS Cmd+Shift+; (→ '+'), Numpad+
+    const isZoomIn =
+      code === 'Equal' ||
+      code === 'NumpadAdd' ||
+      (code === 'Semicolon' && e.shiftKey) ||
+      key === '+' ||
+      key === '=';
+
+    // ズームアウト: Cmd+-, Cmd+_, Numpad-
+    const isZoomOut =
+      code === 'Minus' ||
+      code === 'NumpadSubtract' ||
+      key === '-' ||
+      key === '_';
+
+    // リセット: Cmd+0, Numpad0
+    const isReset = code === 'Digit0' || code === 'Numpad0' || key === '0';
+
+    if (isZoomIn) {
       e.preventDefault();
       applyZoom(0.1);
-    } else if (e.key === '-' || e.key === '_') {
+    } else if (isZoomOut) {
       e.preventDefault();
       applyZoom(-0.1);
-    } else if (e.key === '0') {
+    } else if (isReset) {
       e.preventDefault();
       resetZoom();
     }
