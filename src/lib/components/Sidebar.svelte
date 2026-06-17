@@ -91,67 +91,93 @@
   }
 </script>
 
-<aside class="flex h-full w-56 flex-col border-r border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-  <!-- ヘッダー -->
-  <div class="flex items-center justify-between border-b border-gray-200 px-3 py-3 dark:border-gray-700">
-    <h1 class="text-sm font-bold text-gray-800 dark:text-gray-200">FileViewer</h1>
-    <button
-      onclick={() => settingsStore.toggleTheme()}
-      class="rounded p-1 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700"
-      title="テーマ切替"
-    >
-      {settingsStore.theme === 'light' ? '🌙' : '☀️'}
-    </button>
-  </div>
-
-  <!-- ファイルを開くボタン -->
-  <div class="p-3">
-    <button
-      onclick={handleOpenFile}
-      class="w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-    >
-      ファイルを開く
-    </button>
-  </div>
-
-  <!-- 最近開いたファイル（タブ風表示） -->
-  {#if fileStore.recentFiles.length > 0}
-    <div class="flex-1 overflow-y-auto">
-      {#each fileStore.recentFiles as entry (entry.id)}
-        {@const isOpen = fileStore.openFiles.some((f) => f.id === entry.id)}
-        {@const isActive = entry.id === fileStore.activeFileId}
-        <div
-          class="group flex items-center gap-1 border-b border-gray-200 dark:border-gray-700
-                 {isActive
-                   ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100'
-                   : isOpen
-                   ? 'bg-gray-100 dark:bg-gray-750 text-gray-600 dark:text-gray-300'
-                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}"
-        >
-          <!-- クリックでファイルを開く / アクティブ切替 -->
-          <button
-            onclick={() => handleOpenRecent(entry)}
-            class="flex flex-1 items-center gap-1.5 px-3 py-2 text-xs font-medium min-w-0 transition-colors"
-            title={entry.path}
-          >
-            <span class="shrink-0">{getFileIcon(entry.extension)}</span>
-            <span class="truncate">{entry.name}</span>
-          </button>
-
-          <!-- 履歴から削除ボタン -->
-          <button
-            onclick={(e: MouseEvent) => { e.stopPropagation(); handleRemoveRecent(entry.id); }}
-            class="mr-2 shrink-0 rounded p-0.5 text-gray-400 opacity-0 group-hover:opacity-100
-                   hover:bg-gray-300 hover:text-gray-700
-                   dark:hover:bg-gray-600 dark:hover:text-gray-200 transition-all"
-            title="履歴から削除"
-          >
-            <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 3l6 6M9 3l-6 6" />
-            </svg>
-          </button>
-        </div>
-      {/each}
+<!--
+  サイドバー本体
+  設計意図:
+  - width を 224px(w-56) ↔ 0px に遷移させ、macOS Finder風の折りたたみ感を出す
+  - 折りたたみ中は overflow-hidden で内部要素のはみ出しを防ぎ、
+    内容自体は opacity と inert で「見えず触れない」状態にする
+  - transition の cubic-bezier(0.32, 0.72, 0, 1) は Apple系の定番カーブ
+-->
+<aside
+  class="flex h-full shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+  style:width={settingsStore.sidebarCollapsed ? '0px' : '14rem'}
+  style:transition="width 280ms cubic-bezier(0.32, 0.72, 0, 1), background-color 300ms ease-in-out, border-color 300ms ease-in-out"
+  inert={settingsStore.sidebarCollapsed}
+  aria-hidden={settingsStore.sidebarCollapsed}
+>
+  <!--
+    内容ラッパー
+    width:14rem に固定して、サイドバー幅0時にも内部レイアウトが崩れないようにする。
+    opacity と transform で「フェードしながら少し左へ消える」macOS風表現。
+  -->
+  <div
+    class="flex h-full w-56 flex-col"
+    style:opacity={settingsStore.sidebarCollapsed ? '0' : '1'}
+    style:transform={settingsStore.sidebarCollapsed ? 'translateX(-8px)' : 'translateX(0)'}
+    style:transition="opacity 180ms ease-out, transform 220ms cubic-bezier(0.32, 0.72, 0, 1)"
+  >
+    <!-- ヘッダー -->
+    <div class="flex items-center justify-between border-b border-gray-200 px-3 py-3 transition-colors duration-300 dark:border-gray-700">
+      <h1 class="text-sm font-bold text-gray-800 transition-colors duration-300 dark:text-gray-200">FileViewer</h1>
+      <button
+        onclick={() => settingsStore.toggleTheme()}
+        class="rounded p-1 text-gray-500 transition-all duration-200 hover:bg-gray-200 hover:scale-110 dark:text-gray-400 dark:hover:bg-gray-700"
+        title="テーマ切替"
+      >
+        {settingsStore.theme === 'light' ? '🌙' : '☀️'}
+      </button>
     </div>
-  {/if}
+
+    <!-- ファイルを開くボタン -->
+    <div class="p-3">
+      <button
+        onclick={handleOpenFile}
+        class="w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow active:scale-[0.98]"
+      >
+        ファイルを開く
+      </button>
+    </div>
+
+    <!-- 最近開いたファイル（タブ風表示） -->
+    {#if fileStore.recentFiles.length > 0}
+      <div class="flex-1 overflow-y-auto">
+        {#each fileStore.recentFiles as entry (entry.id)}
+          {@const isOpen = fileStore.openFiles.some((f) => f.id === entry.id)}
+          {@const isActive = entry.id === fileStore.activeFileId}
+          <div
+            class="group flex items-center gap-1 border-b border-gray-200 transition-colors duration-200 dark:border-gray-700
+                   {isActive
+                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                     : isOpen
+                     ? 'bg-gray-100 dark:bg-gray-750 text-gray-600 dark:text-gray-300'
+                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}"
+          >
+            <!-- クリックでファイルを開く / アクティブ切替 -->
+            <button
+              onclick={() => handleOpenRecent(entry)}
+              class="flex flex-1 items-center gap-1.5 px-3 py-2 text-xs font-medium min-w-0 transition-colors duration-200"
+              title={entry.path}
+            >
+              <span class="shrink-0">{getFileIcon(entry.extension)}</span>
+              <span class="truncate">{entry.name}</span>
+            </button>
+
+            <!-- 履歴から削除ボタン -->
+            <button
+              onclick={(e: MouseEvent) => { e.stopPropagation(); handleRemoveRecent(entry.id); }}
+              class="mr-2 shrink-0 rounded p-0.5 text-gray-400 opacity-0 group-hover:opacity-100
+                     hover:bg-gray-300 hover:text-gray-700
+                     dark:hover:bg-gray-600 dark:hover:text-gray-200 transition-all duration-200"
+              title="履歴から削除"
+            >
+              <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3l6 6M9 3l-6 6" />
+              </svg>
+            </button>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
 </aside>
