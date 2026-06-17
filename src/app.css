@@ -2,3 +2,24 @@
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  グローバルテーマ遷移
+  設計意図:
+  - html/body の背景色・文字色変化を 300ms ease-in-out で滑らかにする
+  - 個別要素の transition は各コンポーネント側で明示的に指定
+  - prefers-reduced-motion が指定されている場合は遷移を無効化（アクセシビリティ）
+*/
+html,
+body {
+  transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
